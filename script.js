@@ -1,29 +1,39 @@
 function wall(x, y, width, height) {
   return Matter.Bodies.rectangle(x, y, width, height, {
-      isStatic: true,
-      render: {
-          fillStyle: '#868e96'
-      }
+    isStatic: true,
+    render: {
+      fillStyle: '#2c3e50', // Darker wall color
+      strokeStyle: '#34495e', // Outline color
+      lineWidth: 2,
+    },
   });
 }
 
 function peg(x, y) {
   return Matter.Bodies.circle(x, y, 14, {
-      label: 'peg',
-      isStatic: true,
-      restitution: 0.5,
-      render: {
-          fillStyle: '#82c91e'
-      }
+    label: 'peg',
+    isStatic: true,
+    restitution: 0.5,
+    render: {
+      fillStyle: '#9b59b6', // Vibrant peg color
+      strokeStyle: '#8e44ad', // Outline color
+      lineWidth: 2,
+      shadowBlur: 10,
+      shadowColor: '#8e44ad', // Shadow effect
+    },
   });
 }
 
 function bead() {
-  return Matter.Bodies.circle(920, 40, 8, {
-      restitution: 0.5,
-      render: {
-          fillStyle: '#e64980'
-      }
+  return Matter.Bodies.circle(window.innerWidth / 2, 40, 8, {
+    restitution: 0.5,
+    render: {
+      fillStyle: '#e74c3c', // Bead color
+      strokeStyle: '#c0392b', // Outline color
+      lineWidth: 2,
+      shadowBlur: 15,
+      shadowColor: '#c0392b', // Shadow effect
+    },
   });
 }
 
@@ -72,11 +82,12 @@ let render = Matter.Render.create({
   element: document.body,
   engine: engine,
   options: {
-      width: 1920,
-      height: 1080,
-      wireframes: false,
-      background: '#f8f9fa'
-  }
+    width: window.innerWidth,
+    height: window.innerHeight,
+    wireframes: false, // Render with colors and styles
+    background: '#1e1e1e', // Dark background for contrast
+    pixelRatio: 'auto', // Adjust pixel ratio for high-resolution displays
+  },
 });
 Matter.Render.run(render);
 

@@ -21,16 +21,20 @@ function setupGaltonBoard() {
     },
   });
 
+  // Start the renderer
+  Matter.Render.run(render);
+
   // Create runner
   console.log("Creating runner");
   const runner = Matter.Runner.create();
   Matter.Runner.run(runner, engine);
 
+  // Update the wall function
   function wall(x, y, width, height) {
     return Matter.Bodies.rectangle(x, y, width, height, {
       isStatic: true,
       render: {
-        fillStyle: '#4c6ef5',
+        fillStyle: '#868e96',
       },
     });
   }
@@ -46,42 +50,53 @@ function setupGaltonBoard() {
 
   // Create divider walls
   console.log("Creating divider walls");
-  for (let x = 0; x <= canvasWidth; x += canvasWidth / 7) {
-    const divider = wall(x, (canvasHeight / 4) * 3, 20, canvasHeight / 2);
+  for (let x = 0; x <= canvasWidth; x += 30) {
+    const divider = wall(x, (canvasHeight / 4) * 3, 8, canvasHeight / 2);
     Matter.World.add(engine.world, divider);
   }
 
-  // Function to create a bead
-  console.log("Creating bead");
+  // Update the bead function
   function bead() {
-    return Matter.Bodies.circle(canvasWidth / 2, 0, 10, {
-      label: 'bead',
+    return Matter.Bodies.circle(canvasWidth / 2, 40, 8, {
+      restitution: 0.5,
       render: {
-        fillStyle: '#4c6ef5',
+        fillStyle: '#e64980',
       },
     });
   }
 
-  // Function to create a peg
-  console.log("Creating pegs");
+  // Update the peg function
   function peg(x, y) {
-    return Matter.Bodies.circle(x, y, 10, {
-      isStatic: true,
+    return Matter.Bodies.circle(x, y, 14, {
       label: 'peg',
+      isStatic: true,
+      restitution: 0.5,
       render: {
-        fillStyle: '#f8f9fa',
+        fillStyle: '#82c91e',
       },
     });
   }
 
-  let isStaggerRow = false;
-  for (let y = canvasHeight / 8; y <= (canvasHeight / 4) * 3; y += canvasHeight / 16) {
-    let startX = isStaggerRow ? canvasWidth / 14 : canvasWidth / 7;
-    for (let x = startX; x <= (canvasWidth / 7) * 6; x += canvasWidth / 7) {
-      Matter.World.add(engine.world, peg(x, y));
+  // Add the randomColor function
+  function randomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
     }
-    isStaggerRow = !isStaggerRow;
+    return color;
   }
+
+  // Update peg positions with random colors
+  let pegs = [];
+  for (let y = 120; y <= (canvasHeight / 4) * 3; y += 80) {
+    for (let x = 60; x <= canvasWidth - 60; x += 120) {
+      const p = peg(x, y);
+      p.render.fillStyle = randomColor(); // Assign random colors to pegs
+      pegs.push(p);
+    }
+  }
+  pegs.forEach((p) => Matter.World.add(engine.world, p));
 
   // Function to drop a bead
   console.log("Creating dropBead function");
@@ -98,6 +113,11 @@ function setupGaltonBoard() {
     Matter.World.add(engine.world, droppedBead);
   }
 
+  // Define the rand function
+  function rand(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
   // Event to light up pegs on collision
   console.log("Creating lightPeg function");
   function lightPeg(event) {
@@ -112,6 +132,9 @@ function setupGaltonBoard() {
   console.log("Adding collision event listener");
   Matter.Events.on(engine, 'collisionStart', lightPeg);
 
+  // Start dropping beads at intervals
+  setInterval(dropBead, 350);
+
   // Adjust canvas size on window resize
 window.addEventListener('resize', () => {
   const canvas = render.canvas; // Get the canvas element from the Matter.Render object
@@ -124,4 +147,3 @@ window.addEventListener('resize', () => {
 document.addEventListener('DOMContentLoaded', setupGaltonBoard);
 // window.onload = setupGaltonBoard;
 
-  
